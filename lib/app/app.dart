@@ -1,8 +1,14 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:provider/provider.dart' as provider;
-import 'package:untitled04/string_service.dart';
-import 'package:untitled04/widget.dart';
+import 'package:untitled04/app/app_route_names.dart';
+import 'package:untitled04/app/app_router.dart';
+import 'package:untitled04/data/repositories/categories/categories_repository.dart';
+import 'package:untitled04/domain/dio_helper.dart';
+import 'package:untitled04/domain/product/products_domain.dart';
+import '../data/repositories/products/products_repository.dart';
+import '../domain/categories/categories_domain.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp() : super(key: null,);
@@ -11,46 +17,54 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context,) {
     return provider.MultiProvider(
       providers: [
-        provider.Provider<StringService>(
-          create: (_,) => StringService(),
-          lazy: false,
-          builder: (context, child) {
-            return riverpod.ProviderScope(
-              child: MaterialApp(
-                title: 'Flutter Demo',
-                theme: ThemeData(
-                  primarySwatch: Colors.grey,
-                  primaryColor: Colors.white,
-                  brightness: Brightness.light,
-                  backgroundColor: const Color(
-                    0xFFE5E5E5,
-                  ),
-                  accentColor: Colors.black,
-                  accentIconTheme: const IconThemeData(color: Colors.white),
-                  dividerColor: Colors.white54,
-                ),
-                darkTheme: ThemeData(
-                  primarySwatch: Colors.grey,
-                  primaryColor: Colors.black,
-                  brightness: Brightness.dark,
-                  backgroundColor: const Color(
-                    0xFF212121,
-                  ),
-                  accentColor: Colors.white,
-                  accentIconTheme: const IconThemeData(color: Colors.black),
-                  dividerColor: Colors.black12,
-                ),
-                builder: (BuildContext buildContext, Widget? child,) {
-                  return SafeArea(
-                    child: child!,
-                  );
-                },
-                home: const MyWidget(),
-              ),
-            );
-          },
+        provider.Provider<Dio>(
+          create: (buildContext,) => DioHelper.init(),
+        ),
+        provider.ProxyProvider<Dio, CategoriesDomain>(
+          create: (buildContext,) => CategoriesFromApiDomain(
+            dioHelper: provider.Provider.of<Dio>(buildContext, listen: false,),
+          ),
+          update: (buildContext, Dio dioHelper, _,) => CategoriesFromApiDomain(
+            dioHelper: dioHelper,
+          ),
+        ),
+        provider.ProxyProvider<CategoriesDomain, CategoriesRepository>(
+          create: (buildContext,) => CategoriesRepository(
+            categoriesDomain: provider.Provider.of<CategoriesDomain>(buildContext, listen: false,),
+          ),
+          update: (buildContext, CategoriesDomain categoriesDomain, _,) => CategoriesRepository(
+            categoriesDomain: categoriesDomain,
+          ),
+        ),
+        provider.ProxyProvider<Dio, ProductsDomain>(
+          create: (buildContext,) => ProductsFromApiDomain(
+            dioHelper: provider.Provider.of<Dio>(buildContext, listen: false,),
+          ),
+          update: (buildContext, Dio dioHelper, _,) => ProductsFromApiDomain(
+            dioHelper: dioHelper,
+          ),
+        ),
+        provider.ProxyProvider<ProductsDomain, ProductsRepository>(
+          create: (buildContext,) => ProductsRepository(
+            productsDomain: provider.Provider.of<ProductsDomain>(buildContext, listen: false,),
+          ),
+          update: (buildContext, ProductsDomain productsDomain, _,) => ProductsRepository(
+            productsDomain: productsDomain,
+          ),
         ),
       ],
+      child: riverpod.ProviderScope(
+        child: MaterialApp(
+          title: 'Homework Task',
+          builder: (BuildContext buildContext, Widget? child,) {
+            return SafeArea(
+              child: child!,
+            );
+          },
+          initialRoute: AppRouteNames.homeScreenRoute,
+          onGenerateRoute: AppRouter.onGenerateRoute,
+        ),
+      ),
     );
   }
 }

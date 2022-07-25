@@ -1,17 +1,22 @@
-import 'package:flutter_app/data/models/orders_model.dart';
-import 'package:flutter_app/domain/orders/get_orders_domain.dart';
+import 'dart:developer';
+import 'package:untitled04/data/models/category/category_model.dart';
+import '../../../domain/categories/categories_domain.dart';
 
-class OrdersRepository {
-  const OrdersRepository();
+class CategoriesRepository {
+  late final CategoriesDomain _categoriesDomain;
 
-  Future<List<Order>> getOrders(GetOrdersDomain getOrdersDomain,) async{
-    final results = await getOrdersDomain.getAllCategories();
-    final resultsAsModels = (results as List).map(
+  CategoriesRepository({required categoriesDomain,}){
+    this._categoriesDomain = categoriesDomain;
+  }
+
+  Future<List<Category>> getAllCategories() async{
+    final results = await this._categoriesDomain.getAllCategories() as List<Map<String, dynamic>>;
+    final resultsAsModels = (results).map(
       (element,){
-        return Order.fromJson(element,);
+        return Category.fromJson(element,);
       }
     ).toList();
-    //log('current orders: ${resultsAsModels.length}', name: "get orders from orders repository");
+    log('current orders: ${resultsAsModels.length}', name: "getAllCategories/CategoriesRepository");
     return resultsAsModels;
   }
 }

@@ -1,4 +1,4 @@
 class AppRouteNames{
-  static const String ordersScreenRoute = "/orders";
-  static const String subOrdersScreenRoute = "/orders/sub_orders";
+  static const String homeScreenRoute = "/home";
+  static const String cartScreenRoute = "/home/cart";
 }

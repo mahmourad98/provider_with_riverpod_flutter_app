@@ -2,49 +2,62 @@ import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled04/data/models/category/category_model.dart';
+import 'package:untitled04/data/models/product/product_model.dart';
 import 'package:untitled04/data/repositories/categories/categories_repository.dart';
+import 'package:untitled04/data/repositories/products/products_repository.dart';
 
-class CategoriesListViewModel extends StateNotifier<CategoriesListState>{
-  final CategoriesRepository categoriesRepository;
+class ProductsListViewModel extends StateNotifier<ProductsListState>{
+  final ProductsRepository productsRepository;
 
-  CategoriesListViewModel({
-    required this.categoriesRepository,
-  }) : super(const CategoriesListStateLoadedSuccess(categories: [],),){
-    loadCategories();
+  ProductsListViewModel({
+    required this.productsRepository,
+  }) : super(const ProductsListStateLoadedSuccess(products: [],),){
+    //loadCategories();
   }
 
-  void _loadState(CategoriesListState newState,){
+  void _loadState(ProductsListState newState,){
     this.state = newState;
   }
 
-  void loadCategories() async{
-    _loadState(const CategoriesListStateLoading(),);
-    await categoriesRepository.getAllCategories().then(
+  void loadProducts() async{
+    _loadState(const ProductsListStateLoading(),);
+    await productsRepository.getAllProducts().then(
       (dynamic result,){
-        _loadState(CategoriesListStateLoadedSuccess(categories: (result as List<Category>),),);
+        _loadState(ProductsListStateLoadedSuccess(products: (result as List<Product>),),);
       },
     ).onError(
       (error, stackTrace){
-        _loadState(CategoriesListStateLoadedError(errorMessage: error.toString(),),);
+        _loadState(ProductsListStateLoadedError(errorMessage: error.toString(),),);
       },
     );
   }
+
+  void loadSearchProducts(String searchValue,) async{
+    final products = (state as ProductsListStateLoadedSuccess).products;
+    _loadState(const ProductsListStateLoading(),);
+    final results =  products.where((element, ) => element.title?.startsWith(searchValue) ?? false).toList();
+    if(searchValue.isEmpty || results.isEmpty){
+      _loadState(ProductsListStateLoadedSuccess(products: products,),);
+    }else{
+      _loadState(ProductsListStateLoadedSuccess(products: results,),);
+    }
+  }
 }
 
-abstract class CategoriesListState{
-  const CategoriesListState();
+abstract class ProductsListState{
+  const ProductsListState();
 }
 
-class CategoriesListStateLoading extends CategoriesListState{
-  const CategoriesListStateLoading();
+class ProductsListStateLoading extends ProductsListState{
+  const ProductsListStateLoading();
 }
 
-class CategoriesListStateLoadedSuccess extends CategoriesListState{
-  final List<Category> categories;
-  const CategoriesListStateLoadedSuccess({required this.categories,});
+class ProductsListStateLoadedSuccess extends ProductsListState{
+  final List<Product> products;
+  const ProductsListStateLoadedSuccess({required this.products,});
 }
 
-class CategoriesListStateLoadedError extends CategoriesListState{
+class ProductsListStateLoadedError extends ProductsListState{
   final String errorMessage;
-  const CategoriesListStateLoadedError({required this.errorMessage,});
+  const ProductsListStateLoadedError({required this.errorMessage,});
 }

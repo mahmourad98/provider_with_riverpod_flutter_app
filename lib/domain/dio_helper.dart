@@ -5,6 +5,7 @@ class DioHelper{
     final Dio dio = Dio(
       BaseOptions(
         receiveDataWhenStatusError: false,
+        setRequestContentTypeWhenNoPayload: false,
       )
     );
     return dio;

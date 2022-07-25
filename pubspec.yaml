@@ -13,12 +13,21 @@ dependencies:
 
   cupertino_icons: any
   material_design_icons_flutter: any
+  provider: any
+  flutter_riverpod: any
+  get_it: any
+  rxdart: any
+  dio: ^4.0.6
+  json_annotation: any
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: any
+  build_runner: any
+  json_serializable: any
 
 flutter:
   uses-material-design: true

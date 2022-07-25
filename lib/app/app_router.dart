@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/data/models/order_categories_model.dart';
-import 'package:flutter_app/presentation/screens/orders_screen/views/orders_screen_view.dart';
-import 'package:flutter_app/presentation/screens/sub_orders_screen/views/sub_orders_screen_view.dart';
+import 'package:untitled04/presentation/cart_screen/cart_screen_view.dart';
+import 'package:untitled04/presentation/home_screen/home_screen_view.dart';
 import 'app_route_names.dart';
 
 class AppRouter{
   static Route? onGenerateRoute(RouteSettings routeSettings,){
     switch (routeSettings.name){
-      case AppRouteNames.ordersScreenRoute:
+      case AppRouteNames.homeScreenRoute:
         return _routeTo(
-          () => const OrdersScreenView(),
+          () => const HomeScreenView(),
         );
-      case AppRouteNames.subOrdersScreenRoute:
+      case AppRouteNames.cartScreenRoute:
         return _routeTo(
-          () => SubOrdersScreenView((routeSettings.arguments as OrdersCategory),),
+          () => const CartScreenView(),
         );
+      default:
+        return null;
     }
   }
 
-  static Route? _routeTo(Widget Function() builderFunction,){
+  static Route? _routeTo(Widget Function() widgetFunction,){
     return MaterialPageRoute(
-      builder: (_,) => SafeArea(child: builderFunction(),),
+      builder: (_,) => widgetFunction(),
     );
   }
 }

@@ -2,49 +2,72 @@ import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:untitled04/data/models/category/category_model.dart';
+import 'package:untitled04/data/models/product/product_model.dart';
 import 'package:untitled04/data/repositories/categories/categories_repository.dart';
 
-class CategoriesListViewModel extends StateNotifier<CategoriesListState>{
-  final CategoriesRepository categoriesRepository;
-
-  CategoriesListViewModel({
-    required this.categoriesRepository,
-  }) : super(const CategoriesListStateLoadedSuccess(categories: [],),){
+class CartListViewModel extends StateNotifier<CartListState>{
+  final cartProducts = <Map<String, dynamic>>[];
+  CartListViewModel() : super(const CartListStateLoadedError(errorMessage: "There Is No Items.",),){
     //loadCategories();
   }
 
-  void _loadState(CategoriesListState newState,){
+  void _loadState(CartListState newState,){
     this.state = newState;
   }
 
-  void loadCategories() async{
-    _loadState(const CategoriesListStateLoading(),);
-    await categoriesRepository.getAllCategories().then(
-      (dynamic result,){
-        _loadState(CategoriesListStateLoadedSuccess(categories: (result as List<Category>),),);
-      },
-    ).onError(
-      (error, stackTrace){
-        _loadState(CategoriesListStateLoadedError(errorMessage: error.toString(),),);
-      },
-    );
+  void loadProducts({required List<Map<String, dynamic>> products,}) async{
+    // (state as CartListStateLoadedSuccess).cartProducts
+    _loadState(const CartListStateLoading(),);
+    if(cartProducts.isEmpty){
+      _loadState(const CartListStateLoadedError(errorMessage: "There Is No Items.",),);
+    }else{
+      _loadState(CartListStateLoadedSuccess(cartProducts: cartProducts,),);
+    }
+  }
+
+  addQuantity(Product product,){
+    if(checkIfWeHaveTheProductInCart(product.id!,)){
+      cartProducts.where((element,) => element['product'].id == product.id,).first['quantity']++;
+    }else{
+      cartProducts.add(
+        {'product': product, 'quantity': 1,}
+      );
+    }
+    loadProducts(products: this.cartProducts,);
+  }
+
+  bool checkIfWeHaveTheProductInCart(String id,){
+    return cartProducts.where((element,) => element['product'].id == id,).length == 1;
+  }
+
+  removeQuantity(Product product,){
+    if(checkIfTheProductQuantityIsOne(product.id!)){
+      cartProducts.removeWhere((element,) => element['product'].id == product.id,);
+    }else{
+      cartProducts.where((element,) => element['product'].id == product.id,).first['quantity']--;
+    }
+    loadProducts(products: this.cartProducts,);
+  }
+
+  checkIfTheProductQuantityIsOne(String id,){
+    return cartProducts.where((element,) => element['product'].id == id,).first['quantity'] == 1;
   }
 }
 
-abstract class CategoriesListState{
-  const CategoriesListState();
+abstract class CartListState{
+  const CartListState();
 }
 
-class CategoriesListStateLoading extends CategoriesListState{
-  const CategoriesListStateLoading();
+class CartListStateLoading extends CartListState{
+  const CartListStateLoading();
 }
 
-class CategoriesListStateLoadedSuccess extends CategoriesListState{
-  final List<Category> categories;
-  const CategoriesListStateLoadedSuccess({required this.categories,});
+class CartListStateLoadedSuccess extends CartListState{
+  final List<Map<String, dynamic>> cartProducts;
+  const CartListStateLoadedSuccess({required this.cartProducts,});
 }
 
-class CategoriesListStateLoadedError extends CategoriesListState{
+class CartListStateLoadedError extends CartListState{
   final String errorMessage;
-  const CategoriesListStateLoadedError({required this.errorMessage,});
+  const CartListStateLoadedError({required this.errorMessage,});
 }

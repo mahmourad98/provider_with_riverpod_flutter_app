@@ -1,28 +1,27 @@
-import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart';
+import '../category/category_model.dart';
 
-import '../orders_model.dart';
+part 'product_model.g.dart';
 
-class OrdersCategory {
-  String? orderCategoryTitle;
-  double? ordersTotal;
-  int? ordersCount;
-  List<Order>? orders;
+@JsonSerializable()
+class Product {
+  String? id;
+  String? title;
+  double? price;
+  Category? category;
+  String? description;
+  String? createdBy;
+  String? createdAt;
+  String? updatedAt;
+  String? slug;
+  String? imageUrl;
 
-  OrdersCategory(this.orderCategoryTitle, this.orders, this.ordersTotal, this.ordersCount,);
+  Product({
+    this.id, this.title, this.price, this.category, this.description, this.createdBy,
+    this.createdAt, this.updatedAt, this.slug, this.imageUrl,
+  });
 
-  OrdersCategory.fromJson(Map<String, dynamic> json) {
-    ordersCount = int.parse(json['ordersCount'].toString(),);
-    ordersTotal = double.parse(json['ordersTotal'].toString(),);
-    orderCategoryTitle = json['orderCategoryTitle'].toString();
-    orders = jsonDecode(json['orders'].toString(),);
-  }
+  factory Product.fromJson(Map<String, dynamic> json) => _$ProductFromJson(json,);
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data =  Map<String, dynamic>();
-    data['ordersCount'] = this.ordersCount;
-    data['ordersTotal'] = this.ordersTotal;
-    data['orderCategoryTitle'] = this.orderCategoryTitle;
-    data['orders'] = this.orders.toString();
-    return data;
-  }
+  Map<String, dynamic> toJson() => _$ProductToJson(this,);
 }

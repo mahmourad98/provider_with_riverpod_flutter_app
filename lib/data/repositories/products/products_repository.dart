@@ -1,17 +1,23 @@
-import 'package:flutter_app/data/models/orders_model.dart';
-import 'package:flutter_app/domain/orders/get_orders_domain.dart';
+import 'dart:developer';
+import 'package:untitled04/data/models/category/category_model.dart';
+import 'package:untitled04/data/models/product/product_model.dart';
+import '../../../domain/product/products_domain.dart';
 
-class OrdersRepository {
-  const OrdersRepository();
+class ProductsRepository {
+  late final ProductsDomain _productsDomain;
 
-  Future<List<Order>> getOrders(GetOrdersDomain getOrdersDomain,) async{
-    final results = await getOrdersDomain.getAllCategories();
+  ProductsRepository({required productsDomain,}){
+    this._productsDomain = productsDomain;
+  }
+
+  Future<List<Product>> getAllProducts() async{
+    final results = await this._productsDomain.getAllProducts();
     final resultsAsModels = (results as List).map(
       (element,){
-        return Order.fromJson(element,);
+        return Product.fromJson(element,);
       }
     ).toList();
-    //log('current orders: ${resultsAsModels.length}', name: "get orders from orders repository");
+    log('current products: ${resultsAsModels.length}', name: "getAllProducts/ProductsRepository");
     return resultsAsModels;
   }
 }
