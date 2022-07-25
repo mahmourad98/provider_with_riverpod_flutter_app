@@ -8,6 +8,7 @@ import 'package:untitled04/data/repositories/products/products_repository.dart';
 
 class ProductsListViewModel extends StateNotifier<ProductsListState>{
   final ProductsRepository productsRepository;
+  var products = <Product>[];
 
   ProductsListViewModel({
     required this.productsRepository,
@@ -23,6 +24,7 @@ class ProductsListViewModel extends StateNotifier<ProductsListState>{
     _loadState(const ProductsListStateLoading(),);
     await productsRepository.getAllProducts().then(
       (dynamic result,){
+        products = result;
         _loadState(ProductsListStateLoadedSuccess(products: (result as List<Product>),),);
       },
     ).onError(
@@ -33,7 +35,6 @@ class ProductsListViewModel extends StateNotifier<ProductsListState>{
   }
 
   void loadSearchProducts(String searchValue,) async{
-    final products = (state as ProductsListStateLoadedSuccess).products;
     _loadState(const ProductsListStateLoading(),);
     final results =  products.where((element, ) => element.title?.startsWith(searchValue) ?? false).toList();
     if(searchValue.isEmpty || results.isEmpty){

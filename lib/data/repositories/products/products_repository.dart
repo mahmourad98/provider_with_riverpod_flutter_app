@@ -20,4 +20,15 @@ class ProductsRepository {
     log('current products: ${resultsAsModels.length}', name: "getAllProducts/ProductsRepository");
     return resultsAsModels;
   }
+
+  Future<List<Product>> getProductsOfCategory(c) async{
+    final results = await this._productsDomain.getAllProducts();
+    final resultsAsModels = (results as List).map(
+            (element,){
+          return Product.fromJson(element,);
+        }
+    ).toList();
+    log('current products: ${resultsAsModels.length}', name: "getAllProducts/ProductsRepository");
+    return resultsAsModels;
+  }
 }
